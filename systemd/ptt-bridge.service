@@ -1,0 +1,16 @@
+[Unit]
+Description=Avatar push-to-talk web bridge (port 8091)
+After=default.target
+
+[Service]
+Type=simple
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStartPre=-/usr/bin/pkill -9 -f ptt_bridge.py
+ExecStart=/home/jetson/neutts-venv/bin/python3 /home/jetson/avatar-voice/ptt_bridge.py
+StandardOutput=append:/tmp/ptt.log
+StandardError=append:/tmp/ptt.log
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,28 @@
+[Unit]
+Description=Avatar voice orchestrator (Push-to-talk -> STT -> LLM -> NeuTTS streaming)
+After=default.target
+
+[Service]
+Type=simple
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=HOME=/home/jetson
+Environment=AVATAR_MIC=plughw:0,0
+Environment=AVATAR_MIC_GAIN=4
+Environment=AVATAR_PTT=1
+Environment=NEU_BACKBONE_DEVICE=gpu
+Environment=NEU_CODEC_DEVICE=cpu
+Environment=NEU_STREAM_CHUNK=40
+Environment=LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu
+Environment=PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStartPre=-/usr/bin/pkill -9 -f neutts_worker.py
+ExecStartPre=-/usr/bin/pkill -9 -f avatar-voice/stt-worker
+ExecStartPre=-/usr/bin/pkill -9 -f avatar-voice/llm-worker
+ExecStartPre=-/bin/rm -f /run/user/1000/avatar-voice.sock
+ExecStart=/home/jetson/avatar-voice/avatar-voice
+StandardOutput=append:/tmp/av.log
+StandardError=append:/tmp/av.log
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

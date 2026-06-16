@@ -1,0 +1,27 @@
+# build artifacts
+avatar-voice/avatar-voice
+avatar-voice/stt-worker
+avatar-voice/llm-worker
+avatar-cpp/avatar_ui
+*.o
+build/
+
+# python
+__pycache__/
+*.pyc
+*-venv/
+hw-venv/
+neutts-venv/
+
+# models / caches (downloaded by setup/download_models.sh; too big for git)
+*.gguf
+*.bin
+.cache/
+f5-onnx/
+
+# generated audio (NOT ref/ — those clips are needed for voice cloning)
+/tmp/
+/avatar-voice/*_out.wav
+/avatar-voice/speaker_hello.wav
+/avatar-voice/speaker_fixed_nfe32.wav
+shot*.png

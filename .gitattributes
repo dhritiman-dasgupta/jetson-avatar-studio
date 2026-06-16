@@ -1,0 +1,5 @@
+# Keep LF on scripts/source so they run on the Linux Jetson regardless of host OS.
+* text=auto eol=lf
+*.png binary
+*.wav binary
+*.onnx binary

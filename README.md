@@ -8,7 +8,26 @@ mic ─▶ trigger (hotword "hey jarvis" OR push-to-talk) ─▶ STT (whisper.cp
                                                                          └──────────────── captions broadcast over a Unix socket to the kiosk + web pages
 ```
 
-This repo is the **full source + context** so you can clone it onto another Jetson and continue development.
+Everything runs **on the device**. No cloud STT, no cloud LLM, no cloud TTS — the mic audio
+never leaves the board.
+
+## Why this is the interesting part
+
+An 8 GB Jetson is not enough memory for this pipeline done naively, and the engineering is all in
+what that forces:
+
+- **The whole stack has to be resident at once.** Speech recognition, the language model and the
+  cloned-voice TTS are all pinned in GPU memory, because reloading a model (~4 s) costs more than
+  living with the pressure — **measured ~8 s/turn all-resident against ~12 s when evicting**.
+- **It still does not fit.** q8 NeuTTS with its codec on the GPU swap-thrashes into an OOM reboot.
+  The codec runs on **CPU** instead. That split is the difference between working and not.
+- **The floor is honest.** The ~8 s "thinking" pause is the Orin's own STT + LLM inference floor,
+  not a bug to tune away. The only way past it is moving STT and the LLM to a faster machine and
+  keeping TTS on the Jetson.
+- **Speech starts before generation finishes.** TTS streams in chunks piped straight to `aplay`,
+  so audio begins ~1–2 s in rather than after the full utterance is synthesised.
+
+Two ways to talk to it: say **"hey jarvis"**, or hold push-to-talk from any browser on the LAN.
 
 ---
 
@@ -44,7 +63,7 @@ This repo is the **full source + context** so you can clone it onto another Jets
 
 ---
 
-## Build & run from scratch (another Jetson)
+## Build and run
 
 Requires: Jetson Orin (8GB+), JetPack 6 / L4T r36.4, CUDA 12.6 toolkit, internet.
 

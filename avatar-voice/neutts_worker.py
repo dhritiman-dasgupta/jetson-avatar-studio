@@ -4,8 +4,8 @@ Drop-in replacement for f5_worker.py — same orchestrator protocol:
   stdin "GEN <text>" -> synth -> aplay -> stdout "RPL done"
   stdin "QUIT"       -> exit
 Runs full-GPU (backbone + neucodec on CUDA). Loads once, warms up, then prints READY.
-Reference = the active avatar's clip (NEU_REF_AUDIO + NEU_REF_TEXT); defaults to the
-speaker API clip. Test:  neutts_worker.py "Hello, I am your avatar." """
+Reference = a voice-clone clip you supply (NEU_REF_AUDIO + NEU_REF_TEXT). No reference
+audio ships with this repo; both variables are required. Test:  neutts_worker.py "Hello, I am your avatar." """
 import os, sys, time, subprocess
 import numpy as np
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
@@ -21,10 +21,10 @@ def emit(s): print(s, file=_PROTO, flush=True)   # protocol channel (real stdout
 
 BB_DEV = os.environ.get("NEU_BACKBONE_DEVICE", "gpu")
 CO_DEV = os.environ.get("NEU_CODEC_DEVICE", "cuda")
-REF_AUDIO = os.path.expanduser(os.environ.get("NEU_REF_AUDIO", "~/avatar-voice/ref/reference_api12.wav"))
-REF_TEXT = os.environ.get("NEU_REF_TEXT",
-            "Kolkata, the capital city of West Bengal, has always been one of the most "
-            "politically active cities in India. In 2026, the political landscape of Kolkata, witnessing a major transfer")
+# Voice-clone reference. NO reference audio ships with this repo -- supply your own.
+# NEU_REF_TEXT must be an accurate transcript of NEU_REF_AUDIO, or cloning degrades badly.
+REF_AUDIO = os.path.expanduser(os.environ.get("NEU_REF_AUDIO", "~/avatar-voice/ref/reference.wav"))
+REF_TEXT = os.environ.get("NEU_REF_TEXT", "")
 OUT = "/tmp/neutts_out.wav"
 SPK = os.environ.get("AVATAR_SPK", "plughw:0,0")
 
@@ -39,6 +39,13 @@ CHUNK = int(os.environ.get("NEU_STREAM_CHUNK", "150"))
 tts.streaming_frames_per_chunk = CHUNK
 tts.streaming_stride_samples = CHUNK * tts.hop_length
 log(f"stream chunk = {CHUNK} frames (~{CHUNK*tts.hop_length/24000:.2f}s)")
+if not os.path.isfile(REF_AUDIO) or not REF_TEXT.strip():
+    log(f"FATAL: need a voice-clone reference. No sample ships with this repo.\n"
+        f"  set NEU_REF_AUDIO to a clean ~10s mono wav of the voice to clone "
+        f"(currently: {REF_AUDIO}, exists={os.path.isfile(REF_AUDIO)})\n"
+        f"  set NEU_REF_TEXT to its exact transcript "
+        f"(currently: {'set' if REF_TEXT.strip() else 'EMPTY'})")
+    sys.exit(2)
 ref_codes = tts.encode_reference(REF_AUDIO)
 log("encoded reference, warming up...")
 _ = tts.infer("Warming up.", ref_codes, REF_TEXT)   # compiles CUDA kernels (one-time)

@@ -13,11 +13,13 @@ import numpy as np
 import soundfile as sf
 from flask import Flask, request, send_file, jsonify, Response
 
-REFS = {   # avatar -> (reference wav, reference text)
-    "speaker": (os.path.expanduser("~/avatar-voice/ref/reference_api12.wav"),
-                  "Kolkata, the capital city of West Bengal, has always been one of the most "
-                  "politically active cities in India. In 2026, the political landscape of "
-                  "Kolkata, witnessing a major transfer"),
+# avatar -> (reference wav, reference text).
+# NO reference audio ships with this repo: point NEU_REF_AUDIO at your own clean ~10s
+# mono clip and set NEU_REF_TEXT to its exact transcript.
+REFS = {
+    "speaker": (os.path.expanduser(os.environ.get("NEU_REF_AUDIO",
+                                                  "~/avatar-voice/ref/reference.wav")),
+                os.environ.get("NEU_REF_TEXT", "")),
 }
 
 app = Flask(__name__)

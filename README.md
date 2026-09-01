@@ -11,6 +11,10 @@ mic ─▶ trigger (hotword "hey jarvis" OR push-to-talk) ─▶ STT (whisper.cp
 Everything runs **on the device**. No cloud STT, no cloud LLM, no cloud TTS — the mic audio
 never leaves the board.
 
+> **On the cloned voice:** no voice sample ships with this repository. The TTS clones a
+> reference clip *you supply* — point `NEU_REF_AUDIO` at your own ~10 s mono wav and set
+> `NEU_REF_TEXT` to its exact transcript. There is no bundled or default speaker.
+
 ## Why this is the interesting part
 
 An 8 GB Jetson is not enough memory for this pipeline done naively, and the engineering is all in

@@ -7,7 +7,7 @@ metadata:
   originSessionId: c340df7a-1285-4391-94c3-c966be977f05
 ---
 
-**2026-06-13: building a C++ Qt avatar app on jetson-desktop to run WITHOUT GNOME** (see [[jetson-wiped-2026-06-12]] for the box state; reach it via Bikram Wi-Fi `192.168.0.106` or Ethernet, plink+password, see that memory for SSH details).
+**2026-06-13: building a C++ Qt avatar app on jetson-desktop to run WITHOUT GNOME** (see [[jetson-wiped-2026-06-12]] for the box state; reach it via the lab Wi-Fi at `<jetson-lan-ip>` or Ethernet, plink + SSH credentials (not published)).
 
 **Board:** Jetson Orin Nano Super Dev Kit (L4T r36.4). Connected display = "HZB" monitor on **DP-1, preferred mode 1080x1080@60** (square panel). Power mode currently **7W** (no 5W on this board; modes 15W/25W/MAXN_SUPER/7W). GStreamer NVIDIA plugins present (`nvv4l2decoder`, `nvdrmvideosink`) for the eventual video/lipsync path.
 

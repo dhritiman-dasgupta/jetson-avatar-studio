@@ -14,11 +14,10 @@ VOCAB = os.path.join(H, "vocab.txt")
 M_A = os.path.join(H, "F5_Preprocess.onnx")
 M_B = os.path.join(H, "F5_Transformer.onnx")
 M_C = os.path.join(H, "F5_Decode.onnx")
+# No reference audio ships with this repo -- supply your own clean ~10s mono clip.
 REF_AUDIO = os.path.expanduser(os.environ.get("F5_REF_AUDIO", "~/avatar-voice/ref/ref10.wav"))
 # ref_text MUST match the reference audio exactly or F5 output degrades (growly/robotic).
-REF_TEXT = os.environ.get("F5_REF_TEXT",
-            "Kolkata, the capital city of West Bengal, has always been one of the "
-            "most politically active cities in India. In 2026, the political landscape of Kolkata")
+REF_TEXT = os.environ.get("F5_REF_TEXT", "")
 SR, HOP = 24000, 256
 
 
